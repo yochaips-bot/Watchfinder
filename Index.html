@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WatchFinder">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="WatchFinder">
+<title>WatchFinder</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230d1117'/%3E%3Ctext x='256' y='320' font-size='280' text-anchor='middle'%3E🎬%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Hebrew:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-faint: #475569;
+    --accent: #6366f1;
+    --accent-soft: rgba(99,102,241,0.15);
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --orange: #f97316;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    background: linear-gradient(160deg, #0a0a0f 0%, #0d1117 40%, #101820 70%, #0a0f18 100%);
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+    color: var(--text-primary);
+    overflow-x: hidden;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+  .bg-grid {
+    position: fixed; inset: 0; opacity: 0.03; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .glow-1 {
+    position: fixed; top: -30%; right: -10%; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .glow-2 {
+    position: fixed; bottom: -20%; left: -10%; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .container {
+    max-width: 760px; margin: 0 auto; padding: 36px 16px;
+    position: relative; z-index: 1;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    background: var(--accent-soft); border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 100px; padding: 7px 18px;
+  }
+  .badge-icon { font-size: 18px; }
+  .badge-text { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #818cf8; }
+  h1 {
+    font-size: clamp(26px, 5vw, 42px); font-weight: 800; line-height: 1.1; margin: 0 0 10px;
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #e2e8f0 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle { font-size: 15px; color: var(--text-muted); font-weight: 300; max-width: 480px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 36px; }
+  .search-bar {
+    display: flex; gap: 8px; margin-bottom: 14px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 5px; transition: border-color 0.3s;
+  }
+  .search-bar:focus-within { border-color: rgba(99,102,241,0.3); }
+  .search-input {
+    flex: 1; padding: 13px 16px; background: transparent; border: none;
+    outline: none; color: var(--text-primary); font-size: 16px; font-family: inherit;
+  }
+  .search-input::placeholder { color: var(--text-faint); }
+  .search-btn {
+    padding: 12px 24px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff; font-weight: 600; font-size: 15px; cursor: pointer;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .search-btn:hover { filter: brightness(1.1); }
+  .search-btn:active { transform: scale(0.97); }
+  .search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .search-btn.loading { background: rgba(99,102,241,0.3); cursor: wait; }
+  .recent { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .recent-label { font-size: 12px; color: var(--text-faint); align-self: center; }
+  .recent-btn {
+    padding: 5px 14px; border-radius: 100px; border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03); color: var(--text-secondary); font-size: 13px;
+    cursor: pointer; font-family: inherit;
+  }
+  .loading-state { text-align: center; padding: 50px 0; }
+  .spinner {
+    width: 44px; height: 44px; border: 3px solid rgba(99,102,241,0.2);
+    border-top-color: #6366f1; border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 18px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--text-muted); font-size: 14px; }
+  .loading-text strong { color: var(--text-secondary); }
+  .loading-steps { margin-top: 10px; font-size: 12px; color: var(--text-faint); }
+  .error-box {
+    padding: 18px 22px; border-radius: 14px;
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; font-size: 14px; text-align: center;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .results { animation: fadeIn 0.4s ease; }
+  .title-card {
+    padding: 24px; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--border); margin-bottom: 18px;
+  }
+  .title-row { display: flex; align-items: start; gap: 14px; margin-bottom: 14px; }
+  .title-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .title-icon.series { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+  .title-icon.movie { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .title-name { font-size: 20px; font-weight: 700; color: #f1f5f9; margin: 0 0 4px; }
+  .title-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .type-badge {
+    padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .type-badge.series { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+  .type-badge.movie { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .title-year { font-size: 13px; color: var(--text-muted); }
+  .title-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+  .section-heading {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted); margin: 0 0 10px 4px;
+  }
+  .platforms-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 22px; }
+  .platform-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  }
+  .platform-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #fff; font-weight: 700; flex-shrink: 0;
+  }
+  .platform-info { flex: 1; min-width: 0; }
+  .platform-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .platform-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .heb-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 100px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+    font-family: 'Noto Sans Hebrew', 'Outfit', sans-serif;
+  }
+  .heb-badge .heb-icon { font-size: 13px; }
+  .heb-badge .heb-label { font-size: 10px; }
+  .torrent-section {
+    margin-bottom: 22px; padding: 18px; border-radius: 14px;
+    background: rgba(249,115,22,0.04); border: 1px solid rgba(249,115,22,0.12);
+  }
+  .torrent-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .stremio-logo {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, #7B5BF5, #5E3FD6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+  }
+  .torrent-header-text { font-size: 14px; font-weight: 600; color: var(--orange); }
+  .torrent-header-sub { font-size: 11px; color: var(--text-faint); }
+  .torrent-list { display: flex; flex-direction: column; gap: 5px; }
+  .torrent-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+  }
+  .torrent-quality {
+    padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; flex-shrink: 0;
+  }
+  .torrent-quality.q4k { background: rgba(168,85,247,0.2); color: #c084fc; }
+  .torrent-quality.q1080 { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .torrent-quality.q720 { background: rgba(34,197,94,0.2); color: #86efac; }
+  .torrent-quality.qother { background: rgba(148,163,184,0.15); color: #94a3b8; }
+  .torrent-details { flex: 1; min-width: 0; }
+  .torrent-name {
+    font-size: 12px; font-weight: 500; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .torrent-meta { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+  .torrent-meta span { margin-right: 8px; }
+  .torrent-seeds { color: var(--green); }
+  .torrent-open-btn {
+    padding: 5px 12px; border-radius: 7px; border: none;
+    background: rgba(123,91,245,0.15); color: #a78bfa;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: inherit; text-decoration: none; display: inline-block; flex-shrink: 0;
+  }
+  .torrent-none { text-align: center; padding: 14px; font-size: 13px; color: var(--text-faint); }
+  .info-box {
+    padding: 16px 18px; border-radius: 12px; margin-bottom: 10px;
+    display: flex; gap: 10px; align-items: start;
+  }
+  .info-box.hebrew { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.15); }
+  .info-box.israel { background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15); }
+  .info-box .icon { font-size: 16px; }
+  .info-box .label {
+    font-size: 11px; font-weight: 600; margin-bottom: 3px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .info-box.hebrew .label { color: #34d399; }
+  .info-box.israel .label { color: #818cf8; }
+  .info-box p { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .back-btn {
+    display: block; width: 100%; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    color: var(--text-secondary); font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: inherit; margin-top: 8px;
+  }
+  .empty { text-align: center; padding: 36px 0; color: var(--text-faint); }
+  .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.5; }
+  .footer {
+    text-align: center; margin-top: 50px; padding: 18px 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px; color: #334155;
+  }
+  .hidden { display: none !important; }
+  @media (max-width: 500px) {
+    .container { padding: 24px 12px; }
+    .platform-card { flex-wrap: wrap; gap: 8px; }
+    .heb-badge { margin-left: 50px; }
+    .torrent-item { flex-wrap: wrap; gap: 6px; }
+    .torrent-open-btn { margin-left: auto; }
+    .search-btn { padding: 12px 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+<div class="container">
+  <div class="header">
+    <div class="badge">
+      <span class="badge-icon">🎬</span>
+      <span class="badge-text">WatchFinder</span>
+    </div>
+    <h1>Where Can I Watch?</h1>
+    <p class="subtitle">Streaming platforms, Hebrew subtitles &amp; Stremio torrents — all in one search</p>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="e.g. Breaking Bad, Oppenheimer, Fauda...">
+    <button class="search-btn" id="searchBtn">Search</button>
+  </div>
+
+  <div class="recent hidden" id="recentSection">
+    <span class="recent-label">Recent:</span>
+  </div>
+
+  <div class="loading-state hidden" id="loadingState">
+    <div class="spinner"></div>
+    <p class="loading-text">Searching for <strong id="loadingQuery"></strong>...</p>
+    <p class="loading-steps" id="loadingSteps">Looking up streaming platforms...</p>
+  </div>
+
+  <div class="error-box hidden" id="errorBox"></div>
+  <div class="results hidden" id="resultsSection"></div>
+
+  <div class="empty" id="emptyState">
+    <div class="empty-icon">🔍</div>
+    <p>Search for any movie or TV series</p>
+    <p style="font-size:13px;color:#334155">Streaming + Hebrew subs + Stremio torrents</p>
+  </div>
+
+  <div class="footer">WatchFinder · Powered by AI + Stremio/Torrentio</div>
+</div>
+
+<script>
+// ══════════════════════════════════
+//  HARDCODED API KEY — no need to enter it
+// ══════════════════════════════════
+const API_KEY = "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";
+
+const SERVICES = {
+  "Netflix":"#E50914","Amazon Prime":"#00A8E1","Disney+":"#113CCF",
+  "Apple TV+":"#000000","HBO Max":"#B537F2","Max":"#B537F2",
+  "Hulu":"#1CE783","Paramount+":"#0064FF","Peacock":"#000",
+  "yes+":"#FF6B00","HOT":"#E4002B","Cellcom TV":"#6B21A8",
+  "Partner TV":"#00B2A9","StinGTV":"#FF4081","Kan 11":"#0077B6",
+};
+
+function getServiceColor(n){for(const[k,c]of Object.entries(SERVICES)){if(n.toLowerCase().includes(k.toLowerCase()))return c;}return"#6366f1";}
+
+function hebrewInfo(s){
+  if(s===true)return{symbol:"עב",color:"#10b981",label:"Hebrew subs",bg:"rgba(16,185,129,0.1)",border:"rgba(16,185,129,0.25)"};
+  if(s===false)return{symbol:"✕",color:"#ef4444",label:"No Hebrew",bg:"rgba(239,68,68,0.1)",border:"rgba(239,68,68,0.25)"};
+  return{symbol:"?",color:"#f59e0b",label:"Unknown",bg:"rgba(245,158,11,0.1)",border:"rgba(245,158,11,0.25)"};
+}
+
+function getQC(t){t=(t||"").toLowerCase();if(t.includes("2160p")||t.includes("4k")||t.includes("uhd"))return"q4k";if(t.includes("1080p"))return"q1080";if(t.includes("720p"))return"q720";return"qother";}
+function getQL(t){t=(t||"").toLowerCase();if(t.includes("2160p")||t.includes("4k")||t.includes("uhd"))return"4K";if(t.includes("1080p"))return"1080p";if(t.includes("720p"))return"720p";return"SD";}
+
+function parseT(raw){
+  const lines=raw.split("\n");let name=lines[0]||raw,size="",seeders="",source="";
+  for(const l of lines){const sm=l.match(/💾\s*([\d.]+\s*[GMKT]B)/i);if(sm)size=sm[1];const se=l.match(/👤\s*(\d+)/);if(se)seeders=se[1];}
+  if(lines.length>1){source=lines[0].replace(/[⚙️🎥]/g,"").trim();if(lines[1]&&!lines[1].includes("💾"))name=lines[1].replace(/[⚙️🎥]/g,"").trim();}
+  return{name,size,seeders,source};
+}
+
+let recentSearches=[];
+try{recentSearches=JSON.parse(localStorage.getItem("wf_recent")||"[]");}catch(e){recentSearches=[];}
+
+const $=(id)=>document.getElementById(id);
+
+renderRecent();
+$("searchInput").addEventListener("keydown",(e)=>{if(e.key==="Enter")doSearch();});
+$("searchBtn").addEventListener("click",doSearch);
+
+function renderRecent(){
+  const s=$("recentSection");
+  if(!recentSearches.length){s.classList.add("hidden");return;}
+  s.querySelectorAll(".recent-btn").forEach(b=>b.remove());
+  s.classList.remove("hidden");
+  recentSearches.forEach(q=>{
+    const b=document.createElement("button");b.className="recent-btn";b.textContent=q;
+    b.addEventListener("click",()=>{$("searchInput").value=q;doSearch();});s.appendChild(b);
+  });
+}
+
+async function lookupIMDB(query){
+  for(const t of["movie","series"]){
+    try{const r=await fetch(`https://v3-cinemeta.strem.io/catalog/${t}/top/search=${encodeURIComponent(query)}.json`);
+    if(!r.ok)continue;const d=await r.json();if(d.metas?.length)return{imdbId:d.metas[0].id,type:t,meta:d.metas[0]};}catch(e){}
+  }return null;
+}
+
+async function fetchTorrentio(imdbId,type){
+  try{const r=await fetch(`https://torrentio.strem.fun/stream/${type}/${imdbId}.json`);
+  if(!r.ok)return[];const d=await r.json();return(d.streams||[]).slice(0,15);}catch(e){return[];}
+}
+
+async function fetchStreaming(query){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",max_tokens:1000,
+      tools:[{type:"web_search_20250305",name:"web_search"}],
+      messages:[{role:"user",content:`Search the web to find where I can watch "${query}" (movie or TV series) on streaming platforms, with a focus on availability in Israel. Also check whether Hebrew subtitles are available on each platform.
+
+IMPORTANT: Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble):
+{"title":"Official title","type":"movie or series","year":"year","description":"One sentence","platforms":[{"name":"Platform","available":true,"hebrew_subtitles":true/false/"unknown","note":"optional"}],"hebrew_subtitles_summary":"summary","israel_availability_note":"notes"}
+
+Include international (Netflix, Amazon Prime, Disney+, Apple TV+, Max, Hulu, Paramount+) and Israeli (yes+, HOT, Cellcom TV, Partner TV, StinGTV) platforms where available.`}],
+    }),
+  });
+  if(!r.ok){const e=await r.json().catch(()=>null);throw new Error(e?.error?.message||`API error: ${r.status}`);}
+  const d=await r.json();
+  const txt=d.content.map(i=>i.type==="text"?i.text:"").filter(Boolean).join("\n");
+  return JSON.parse(txt.replace(/```json|```/g,"").trim());
+}
+
+async function doSearch(){
+  const query=$("searchInput").value.trim();if(!query)return;
+  $("emptyState").classList.add("hidden");
+  $("resultsSection").classList.add("hidden");
+  $("errorBox").classList.add("hidden");
+  $("recentSection").classList.add("hidden");
+  $("loadingState").classList.remove("hidden");
+  $("loadingQuery").textContent=`"${query}"`;
+  $("loadingSteps").textContent="Looking up streaming platforms...";
+  $("searchBtn").disabled=true;$("searchBtn").classList.add("loading");$("searchBtn").textContent="Searching...";
+
+  try{
+    const[streaming,imdb]=await Promise.all([fetchStreaming(query),lookupIMDB(query)]);
+    $("loadingSteps").textContent="Searching Stremio torrents...";
+    let torrents=[];if(imdb)torrents=await fetchTorrentio(imdb.imdbId,imdb.type);
+    showResults(streaming,torrents,imdb);
+    recentSearches=[query,...recentSearches.filter(s=>s!==query)].slice(0,5);
+    try{localStorage.setItem("wf_recent",JSON.stringify(recentSearches));}catch(e){}
+  }catch(err){
+    $("errorBox").textContent=err.message||"Could not find info. Try again.";
+    $("errorBox").classList.remove("hidden");
+  }finally{
+    $("loadingState").classList.add("hidden");
+    $("searchBtn").disabled=false;$("searchBtn").classList.remove("loading");$("searchBtn").textContent="Search";
+  }
+}
+
+function showResults(data,torrents,imdb){
+  const el=$("resultsSection");
+  const tc=data.type==="series"?"series":"movie";
+  const te=data.type==="series"?"📺":"🎬";
+  const id=imdb?.imdbId||"";
+
+  let ph="";
+  (data.platforms||[]).forEach(p=>{
+    const c=getServiceColor(p.name),h=hebrewInfo(p.hebrew_subtitles);
+    ph+=`<div class="platform-card">
+      <div class="platform-icon" style="background:${c}">${esc(p.name.charAt(0))}</div>
+      <div class="platform-info"><div class="platform-name">${esc(p.name)}</div>
+      ${p.note?`<div class="platform-note">${esc(p.note)}</div>`:""}</div>
+      <div class="heb-badge" style="background:${h.bg};border:1px solid ${h.border};color:${h.color}">
+        <span class="heb-icon">${h.symbol}</span><span class="heb-label">${h.label}</span>
+      </div></div>`;
+  });
+
+  let th="";
+  if(torrents.length){
+    torrents.forEach(s=>{
+      const{name,size,seeders,source}=parseT(s.title||"");
+      const link=id?`stremio://detail/${imdb.type}/${id}`:"#";
+      th+=`<div class="torrent-item">
+        <span class="torrent-quality ${getQC(s.title)}">${getQL(s.title)}</span>
+        <div class="torrent-details">
+          <div class="torrent-name" title="${esc(s.title||name)}">${esc(source||name)}</div>
+          <div class="torrent-meta">
+            ${size?`<span>💾 ${esc(size)}</span>`:""}
+            ${seeders?`<span class="torrent-seeds">👤 ${esc(seeders)}</span>`:""}
+          </div>
+        </div>
+        <a class="torrent-open-btn" href="${link}">▶ Stremio</a>
+      </div>`;
+    });
+  }else{
+    th=`<div class="torrent-none">No torrents found${id?"":" — IMDB not resolved"}</div>`;
+  }
+
+  el.innerHTML=`
+    <div class="title-card"><div class="title-row">
+      <div class="title-icon ${tc}">${te}</div>
+      <div><h2 class="title-name">${esc(data.title)}</h2>
+        <div class="title-meta">
+          <span class="type-badge ${tc}">${esc(data.type)}</span>
+          ${data.year?`<span class="title-year">${esc(data.year)}</span>`:""}
+          ${id?`<span class="title-year" style="opacity:.4">${esc(id)}</span>`:""}
+        </div></div></div>
+      ${data.description?`<p class="title-desc">${esc(data.description)}</p>`:""}
+    </div>
+    <h3 class="section-heading">📡 Streaming — ${(data.platforms||[]).length} platform${(data.platforms||[]).length!==1?"s":""}</h3>
+    <div class="platforms-list">${ph}</div>
+    <div class="torrent-section">
+      <div class="torrent-header">
+        <div class="stremio-logo">S</div>
+        <div><div class="torrent-header-text">Stremio / Torrentio</div>
+          <div class="torrent-header-sub">${torrents.length} stream${torrents.length!==1?"s":""} · Tap ▶ to open in Stremio</div>
+        </div></div>
+      <div class="torrent-list">${th}</div>
+    </div>
+    ${data.hebrew_subtitles_summary?`<div class="info-box hebrew"><span class="icon">🇮🇱</span><div><div class="label">Hebrew Subtitles</div><p>${esc(data.hebrew_subtitles_summary)}</p></div></div>`:""}
+    ${data.israel_availability_note?`<div class="info-box israel"><span class="icon">📍</span><div><div class="label">Israel Availability</div><p>${esc(data.israel_availability_note)}</p></div></div>`:""}
+    <button class="back-btn" id="backBtn">← Search another title</button>`;
+
+  el.classList.remove("hidden");
+  document.getElementById("backBtn").addEventListener("click",()=>{
+    el.classList.add("hidden");$("searchInput").value="";
+    $("emptyState").classList.remove("hidden");renderRecent();$("searchInput").focus();
+  });
+}
+
+function esc(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
+</script>
+</body>
+</html>
