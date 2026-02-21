@@ -16,11 +16,19 @@ body{min-height:100vh;background:linear-gradient(160deg,#0a0a0f,#0d1117 40%,#101
 .badge-text{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#818cf8}
 h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;margin:0 0 10px;background:linear-gradient(135deg,#e2e8f0,#94a3b8,#e2e8f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .subtitle{font-size:15px;color:var(--text-muted);font-weight:300}
-.search-bar{display:flex;gap:8px;margin-bottom:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:5px}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-bar{display:flex;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:5px}
 .search-input{flex:1;padding:13px 16px;background:transparent;border:none;outline:none;color:var(--text-primary);font-size:16px;font-family:inherit}
 .search-input::placeholder{color:var(--text-faint)}
 .search-btn{padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit}
 .search-btn:disabled{opacity:.4}.search-btn.loading{background:rgba(99,102,241,.3)}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid var(--border);border-radius:12px;margin-top:4px;overflow:hidden;z-index:99;display:none}
+.suggest-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s}
+.suggest-item:hover{background:rgba(99,102,241,.1)}
+.suggest-img{width:36px;height:52px;border-radius:4px;object-fit:cover;background:#2a2a3e;flex-shrink:0}
+.suggest-info{flex:1;min-width:0}
+.suggest-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest-meta{font-size:11px;color:var(--text-faint)}
 .key-box{margin-bottom:20px;padding:16px;border-radius:14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15)}
 .key-box label{display:block;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:8px}
 .key-row{display:flex;gap:8px}
@@ -42,15 +50,23 @@ h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;margin:0 0 10p
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .results{animation:fadeIn .4s ease}
 .title-card{padding:24px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--border);margin-bottom:18px}
-.title-row{display:flex;align-items:start;gap:14px;margin-bottom:14px}
-.title-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.title-icon.series{background:linear-gradient(135deg,#6366f1,#8b5cf6)}.title-icon.movie{background:linear-gradient(135deg,#f59e0b,#ef4444)}
-.title-name{font-size:20px;font-weight:700;color:#f1f5f9;margin:0 0 4px}
-.title-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.title-top{display:flex;gap:16px;margin-bottom:14px}
+.title-poster{width:100px;height:148px;border-radius:10px;object-fit:cover;background:#1a1a2e;flex-shrink:0}
+.title-info{flex:1;min-width:0}
+.title-name{font-size:20px;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+.title-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .type-badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase}
 .type-badge.series{background:rgba(99,102,241,.15);color:#a5b4fc}.type-badge.movie{background:rgba(245,158,11,.15);color:#fbbf24}
 .title-year{font-size:13px;color:var(--text-muted)}
-.title-desc{font-size:14px;color:var(--text-secondary);line-height:1.5}
+.imdb-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.2)}
+.imdb-star{color:#f5c518;font-size:13px}
+.imdb-score{font-size:12px;font-weight:700;color:#f5c518}
+.imdb-max{font-size:10px;color:var(--text-faint)}
+.title-genres{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.genre-tag{padding:2px 8px;border-radius:100px;font-size:10px;background:rgba(255,255,255,.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,.08)}
+.title-desc{font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.title-details{font-size:11px;color:var(--text-faint);line-height:1.6}
+.title-details span{margin-right:12px}
 .section-heading{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 10px 4px}
 .platforms-list{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
 .platform-card{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
@@ -80,7 +96,15 @@ h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;margin:0 0 10p
 .empty{text-align:center;padding:36px 0;color:var(--text-faint)}.empty-icon{font-size:44px;margin-bottom:14px;opacity:.5}
 .footer{text-align:center;margin-top:50px;padding:18px 0;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:#334155}
 .hidden{display:none!important}
-@media(max-width:500px){.platform-card{flex-wrap:wrap;gap:8px}.heb-badge{margin-left:50px}.torrent-item{flex-wrap:wrap;gap:6px}.torrent-open-btn{margin-left:auto}}
+.similar-section{margin-top:22px;margin-bottom:22px}
+.similar-grid{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.similar-card{flex-shrink:0;width:120px;cursor:pointer;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:border-color .2s}
+.similar-card:hover{border-color:rgba(99,102,241,.3)}
+.similar-poster{width:120px;height:170px;object-fit:cover;background:#1a1a2e;display:block}
+.similar-info{padding:8px}
+.similar-title{font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.similar-year{font-size:10px;color:var(--text-faint);margin-top:2px}
+@media(max-width:500px){.platform-card{flex-wrap:wrap;gap:8px}.heb-badge{margin-left:50px}.torrent-item{flex-wrap:wrap;gap:6px}.torrent-open-btn{margin-left:auto}.title-poster{width:80px;height:118px}}
 </style>
 </head>
 <body>
@@ -99,9 +123,12 @@ h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;margin:0 0 10p
 <p class="key-ok hidden" id="ko">✓ Key saved</p>
 <p class="key-hint">Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
 </div>
+<div class="search-wrap">
 <div class="search-bar">
-<input type="text" class="search-input" id="si" placeholder="e.g. Breaking Bad, Oppenheimer, Fauda...">
+<input type="text" class="search-input" id="si" placeholder="e.g. Breaking Bad, Oppenheimer, Fauda..." autocomplete="off">
 <button class="search-btn" id="sb">Search</button>
+</div>
+<div class="suggest-list" id="sg"></div>
 </div>
 <div class="recent hidden" id="rc"><span class="recent-label">Recent:</span></div>
 <div class="loading-state hidden" id="ls"><div class="spinner"></div><p class="loading-text">Searching for <strong id="lq"></strong>...</p><p class="loading-steps" id="lt">Looking up streaming platforms...</p></div>
@@ -117,26 +144,132 @@ var K=gk();
 var $=function(i){return document.getElementById(i)};
 if(K){$("ki").value="saved";$("ko").classList.remove("hidden");$("ko").textContent="✓ Key saved";$("kb").style.borderColor="rgba(16,185,129,.3)";$("kb").style.background="rgba(16,185,129,.04)"}
 $("ks").onclick=function(){var v=$("ki").value.trim();if(v&&v.indexOf("sk-")===0){K=v;xk(v);$("ko").classList.remove("hidden");$("ko").textContent="✓ Key saved!";$("kb").style.borderColor="rgba(16,185,129,.3)";$("kb").style.background="rgba(16,185,129,.04)"}};
+
+/* Autocomplete */
+var sgTimer=null;
+$("si").addEventListener("input",function(){clearTimeout(sgTimer);var q=this.value.trim();if(q.length<2){$("sg").style.display="none";return}sgTimer=setTimeout(function(){doSuggest(q)},350)});
+$("si").addEventListener("keydown",function(ev){if(ev.key==="Enter"){$("sg").style.display="none";ds()}});
+document.addEventListener("click",function(ev){if(!ev.target.closest(".search-wrap"))$("sg").style.display="none"});
+
+function doSuggest(q){
+  Promise.all([
+    fetch("https://v3-cinemeta.strem.io/catalog/movie/top/search="+encodeURIComponent(q)+".json").then(function(r){return r.ok?r.json():{}}).catch(function(){return{}}),
+    fetch("https://v3-cinemeta.strem.io/catalog/series/top/search="+encodeURIComponent(q)+".json").then(function(r){return r.ok?r.json():{}}).catch(function(){return{}})
+  ]).then(function(res){
+    var all=[];
+    if(res[0]&&res[0].metas)all=all.concat(res[0].metas.slice(0,4));
+    if(res[1]&&res[1].metas)all=all.concat(res[1].metas.slice(0,4));
+    all.sort(function(a,b){return(b.popularity||0)-(a.popularity||0)});
+    all=all.slice(0,6);
+    var sg=$("sg");
+    if(!all.length){sg.style.display="none";return}
+    var h="";
+    for(var i=0;i<all.length;i++){
+      var m=all[i];
+      h+='<div class="suggest-item" data-name="'+e(m.name)+'">'
+        +'<img class="suggest-img" src="'+(m.poster||"")+'" onerror="this.style.visibility=\'hidden\'">'
+        +'<div class="suggest-info"><div class="suggest-name">'+e(m.name)+'</div>'
+        +'<div class="suggest-meta">'+(m.type||"")+(m.releaseInfo?" · "+m.releaseInfo:"")+(m.imdbRating?" · ⭐ "+m.imdbRating:"")+'</div></div></div>';
+    }
+    sg.innerHTML=h;
+    sg.style.display="block";
+    var items=sg.querySelectorAll(".suggest-item");
+    for(var j=0;j<items.length;j++){
+      items[j].onclick=function(){$("si").value=this.getAttribute("data-name");sg.style.display="none";ds()}
+    }
+  })
+}
+
 var SV={"Netflix":"#E50914","Amazon Prime":"#00A8E1","Disney+":"#113CCF","Apple TV+":"#000","HBO Max":"#B537F2","Max":"#B537F2","Hulu":"#1CE783","Paramount+":"#0064FF","yes+":"#FF6B00","HOT":"#E4002B","Cellcom TV":"#6B21A8","Partner TV":"#00B2A9","StinGTV":"#FF4081"};
 function gc(n){for(var k in SV)if(n.toLowerCase().indexOf(k.toLowerCase())>=0)return SV[k];return"#6366f1"}
 function hi(s){if(s===true)return{s:"עב",c:"#10b981",l:"Hebrew subs",b:"rgba(16,185,129,0.1)",d:"rgba(16,185,129,0.25)"};if(s===false)return{s:"✕",c:"#ef4444",l:"No Hebrew",b:"rgba(239,68,68,0.1)",d:"rgba(239,68,68,0.25)"};return{s:"?",c:"#f59e0b",l:"Unknown",b:"rgba(245,158,11,0.1)",d:"rgba(245,158,11,0.25)"}}
 function qc(t){t=(t||"").toLowerCase();if(t.indexOf("2160p")>=0||t.indexOf("4k")>=0)return"q4k";if(t.indexOf("1080p")>=0)return"q1080";if(t.indexOf("720p")>=0)return"q720";return"qother"}
 function ql(t){t=(t||"").toLowerCase();if(t.indexOf("2160p")>=0||t.indexOf("4k")>=0)return"4K";if(t.indexOf("1080p")>=0)return"1080p";if(t.indexOf("720p")>=0)return"720p";return"SD"}
-function pt(r){var l=r.split("\n");var n=l[0]||r,z="",s="",o="";for(var i=0;i<l.length;i++){var a=l[i].match(/💾\s*([\d.]+\s*[GMKT]B)/i);if(a)z=a[1];var b=l[i].match(/👤\s*(\d+)/);if(b)s=b[1]}if(l.length>1){o=l[0].replace(/[⚙️🎥]/g,"").trim();if(l[1]&&l[1].indexOf("💾")<0)n=l[1].replace(/[⚙️🎥]/g,"").trim()}return{n:n,z:z,s:s,o:o}}
+function pt(r){var l=r.split("\n");var n=l[0]||r,z="",s="",o="",h=false;var rl=r.toLowerCase();if(rl.indexOf("hebsub")>=0||rl.indexOf("heb.sub")>=0||rl.indexOf("hebrew")>=0||rl.indexOf("עברית")>=0||rl.indexOf("heb ")>=0||rl.indexOf(".heb.")>=0||rl.indexOf("hebdub")>=0)h=true;for(var i=0;i<l.length;i++){var a=l[i].match(/💾\s*([\d.]+\s*[GMKT]B)/i);if(a)z=a[1];var b=l[i].match(/👤\s*(\d+)/);if(b)s=b[1]}if(l.length>1){o=l[0].replace(/[⚙️🎥]/g,"").trim();if(l[1]&&l[1].indexOf("💾")<0)n=l[1].replace(/[⚙️🎥]/g,"").trim()}return{n:n,z:z,s:s,o:o,h:h}}
 var rv=[];try{rv=JSON.parse(localStorage.getItem("wf_r")||"[]")}catch(e){}
 rr();
-$("si").addEventListener("keydown",function(e){if(e.key==="Enter")ds()});
 $("sb").addEventListener("click",ds);
+
 function rr(){var s=$("rc");if(!rv.length){s.classList.add("hidden");return}var btns=s.querySelectorAll(".recent-btn");for(var i=0;i<btns.length;i++)btns[i].remove();s.classList.remove("hidden");for(var j=0;j<rv.length;j++){var b=document.createElement("button");b.className="recent-btn";b.textContent=rv[j];b.setAttribute("data-q",rv[j]);b.onclick=function(){$("si").value=this.getAttribute("data-q");ds()};s.appendChild(b)}}
-function li(q){return new Promise(function(resolve){var types=["movie","series"];var idx=0;function tryNext(){if(idx>=types.length){resolve(null);return}var t=types[idx];idx++;fetch("https://v3-cinemeta.strem.io/catalog/"+t+"/top/search="+encodeURIComponent(q)+".json").then(function(r){if(!r.ok){tryNext();return}return r.json()}).then(function(d){if(d&&d.metas&&d.metas.length){resolve({id:d.metas[0].id,t:t,m:d.metas[0]})}else{tryNext()}}).catch(function(){tryNext()})}tryNext()})}
+
+function li(q){return new Promise(function(resolve){var types=["movie","series"];var idx=0;function tryNext(){if(idx>=types.length){resolve(null);return}var t=types[idx];idx++;fetch("https://v3-cinemeta.strem.io/catalog/"+t+"/top/search="+encodeURIComponent(q)+".json").then(function(r){if(!r.ok){tryNext();return}return r.json()}).then(function(d){if(d&&d.metas&&d.metas.length){var m=d.metas[0];resolve({id:m.id,t:t,m:m,similar:d.metas.slice(1,7)})}else{tryNext()}}).catch(function(){tryNext()})}tryNext()})}
+
+function getMeta(id,type){return fetch("https://v3-cinemeta.strem.io/meta/"+type+"/"+id+".json").then(function(r){return r.ok?r.json():{}}).then(function(d){return d.meta||{}}).catch(function(){return{}})}
+
 function ft(id,t){return fetch("https://torrentio.strem.fun/stream/"+t+"/"+id+".json").then(function(r){if(!r.ok)return[];return r.json()}).then(function(d){return(d.streams||[]).slice(0,15)}).catch(function(){return[]})}
-function fs(q){return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":K,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:'Search the web to find where I can watch "'+q+'" (movie or TV series) on streaming platforms, with a focus on availability in Israel. Also check whether Hebrew subtitles are available on each platform.\nIMPORTANT: Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble):\n{"title":"Official title","type":"movie or series","year":"year","description":"One sentence","platforms":[{"name":"Platform","available":true,"hebrew_subtitles":true,"note":"optional"}],"hebrew_subtitles_summary":"summary","israel_availability_note":"notes"}\nInclude international (Netflix, Amazon Prime, Disney+, Apple TV+, Max, Hulu, Paramount+) and Israeli (yes+, HOT, Cellcom TV, Partner TV, StinGTV) platforms where available.'}]})}).then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error?e.error.message:"API error")});return r.json()}).then(function(d){var txt="";for(var i=0;i<d.content.length;i++){if(d.content[i].type==="text")txt+=d.content[i].text}return JSON.parse(txt.replace(/```json|```/g,"").trim())})}
+
+function fs(q){return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":K,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:'Search the web to find where I can CURRENTLY watch "'+q+'" (movie or TV series) on streaming platforms, with a focus on availability in Israel.\n\nCRITICAL RULES:\n1. ONLY list platforms where the title is CURRENTLY available to stream. Do NOT list platforms where it is unavailable, was previously available, or might be available in the future.\n2. If you are not confident a title is on a platform, DO NOT include that platform.\n3. Israeli platforms (yes+, HOT, Cellcom TV, Partner TV, StinGTV, Kan 11) ALWAYS have Hebrew subtitles - set hebrew_subtitles to true for any Israeli platform.\n4. For international platforms, only mark hebrew_subtitles as true if you find specific evidence of Hebrew subtitle support.\n5. Be precise - quality over quantity. A short accurate list is better than a long inaccurate one.\n\nRespond ONLY with a valid JSON object (no markdown, no backticks, no preamble):\n{"title":"Official title","type":"movie or series","year":"year","description":"One sentence","platforms":[{"name":"Platform","available":true,"hebrew_subtitles":true,"note":"optional"}],"hebrew_subtitles_summary":"summary","israel_availability_note":"notes"}\nOnly include platforms where the title is confirmed currently streaming.'}]})}).then(function(r){if(!r.ok)return r.json().then(function(e){throw new Error(e.error?e.error.message:"API error")});return r.json()}).then(function(d){var txt="";for(var i=0;i<d.content.length;i++){if(d.content[i].type==="text")txt+=d.content[i].text}return JSON.parse(txt.replace(/```json|```/g,"").trim())})}
+
 function ds(){var q=$("si").value.trim();if(!q)return;if(!K){alert("Please enter your API key first");return}
+$("sg").style.display="none";
 $("es").classList.add("hidden");$("rs").classList.add("hidden");$("eb").classList.add("hidden");$("rc").classList.add("hidden");
 $("ls").classList.remove("hidden");$("lq").textContent='"'+q+'"';$("lt").textContent="Looking up streaming platforms...";
 $("sb").disabled=true;$("sb").classList.add("loading");$("sb").textContent="Searching...";
-Promise.all([fs(q),li(q)]).then(function(res){var st=res[0],im=res[1];$("lt").textContent="Searching Stremio torrents...";var p=im?ft(im.id,im.t):Promise.resolve([]);return p.then(function(tr){sr(st,tr,im);rv=[q].concat(rv.filter(function(s){return s!==q})).slice(0,5);try{localStorage.setItem("wf_r",JSON.stringify(rv))}catch(e){}})}).catch(function(e){$("eb").textContent=e.message||"Error";$("eb").classList.remove("hidden")}).then(function(){$("ls").classList.add("hidden");$("sb").disabled=false;$("sb").classList.remove("loading");$("sb").textContent="Search"})}
-function sr(d,tr,im){var el=$("rs"),tc=d.type==="series"?"series":"movie",te=d.type==="series"?"📺":"🎬",id=im?im.id:"";var ph="";var pl=d.platforms||[];for(var i=0;i<pl.length;i++){var p=pl[i],c=gc(p.name),h=hi(p.hebrew_subtitles);ph+='<div class="platform-card"><div class="platform-icon" style="background:'+c+'">'+e(p.name.charAt(0))+'</div><div class="platform-info"><div class="platform-name">'+e(p.name)+'</div>'+(p.note?'<div class="platform-note">'+e(p.note)+'</div>':'')+'</div><div class="heb-badge" style="background:'+h.b+';border:1px solid '+h.d+';color:'+h.c+'"><span style="font-size:13px">'+h.s+'</span><span style="font-size:10px">'+h.l+'</span></div></div>'}var th="";if(tr.length){for(var j=0;j<tr.length;j++){var s=tr[j],pp=pt(s.title||""),lk=id?"stremio://detail/"+im.t+"/"+id:"#";th+='<div class="torrent-item"><span class="torrent-quality '+qc(s.title)+'">'+ql(s.title)+'</span><div class="torrent-details"><div class="torrent-name" title="'+e(s.title||pp.n)+'">'+e(pp.o||pp.n)+'</div><div class="torrent-meta">'+(pp.z?'<span>💾 '+e(pp.z)+'</span>':'')+(pp.s?'<span class="torrent-seeds">👤 '+e(pp.s)+'</span>':'')+'</div></div><a class="torrent-open-btn" href="'+lk+'">▶ Stremio</a></div>'}}else{th='<div class="torrent-none">No torrents found</div>'}el.innerHTML='<div class="title-card"><div class="title-row"><div class="title-icon '+tc+'">'+te+'</div><div><h2 class="title-name">'+e(d.title)+'</h2><div class="title-meta"><span class="type-badge '+tc+'">'+e(d.type)+'</span>'+(d.year?'<span class="title-year">'+e(d.year)+'</span>':'')+(id?'<span class="title-year" style="opacity:.4">'+e(id)+'</span>':'')+'</div></div></div>'+(d.description?'<p class="title-desc">'+e(d.description)+'</p>':'')+'</div><h3 class="section-heading">📡 Streaming — '+pl.length+' platform'+(pl.length!==1?'s':'')+'</h3><div class="platforms-list">'+ph+'</div><div class="torrent-section"><div class="torrent-header"><div class="stremio-logo">S</div><div><div class="torrent-header-text">Stremio / Torrentio</div><div class="torrent-header-sub">'+tr.length+' stream'+(tr.length!==1?'s':'')+' · Tap ▶ to open in Stremio</div></div></div><div class="torrent-list">'+th+'</div></div>'+(d.hebrew_subtitles_summary?'<div class="info-box hebrew"><span class="icon">🇮🇱</span><div><div class="label">Hebrew Subtitles</div><p>'+e(d.hebrew_subtitles_summary)+'</p></div></div>':'')+(d.israel_availability_note?'<div class="info-box israel"><span class="icon">📍</span><div><div class="label">Israel Availability</div><p>'+e(d.israel_availability_note)+'</p></div></div>':'')+'<button class="back-btn" id="bb">← Search another title</button>';el.classList.remove("hidden");document.getElementById("bb").onclick=function(){el.classList.add("hidden");$("si").value="";$("es").classList.remove("hidden");rr();$("si").focus()}}
+Promise.all([fs(q),li(q)]).then(function(res){var st=res[0],im=res[1];$("lt").textContent="Searching Stremio torrents...";
+var metaP=im?getMeta(im.id,im.t):Promise.resolve({});
+var trP=im?ft(im.id,im.t):Promise.resolve([]);
+return Promise.all([metaP,trP]).then(function(r2){sr(st,r2[1],im,r2[0]);rv=[q].concat(rv.filter(function(s){return s!==q})).slice(0,5);try{localStorage.setItem("wf_r",JSON.stringify(rv))}catch(e){}})}).catch(function(err){$("eb").textContent=err.message||"Error";$("eb").classList.remove("hidden")}).then(function(){$("ls").classList.add("hidden");$("sb").disabled=false;$("sb").classList.remove("loading");$("sb").textContent="Search"})}
+
+function sr(d,tr,im,meta){
+  var el=$("rs"),tc=d.type==="series"?"series":"movie",te=d.type==="series"?"📺":"🎬",id=im?im.id:"";
+  var poster=meta.poster||im&&im.m&&im.m.poster||"";
+  var rating=meta.imdbRating||im&&im.m&&im.m.imdbRating||"";
+  var genres=meta.genres||[];
+  var desc=meta.description||d.description||"";
+  var runtime=meta.runtime||"";
+  var cast=(meta.cast||[]).slice(0,4).join(", ");
+  var director=(meta.director||[]).slice(0,2).join(", ");
+
+  var ratingHtml="";
+  if(rating){ratingHtml='<div class="imdb-badge"><span class="imdb-star">⭐</span><span class="imdb-score">'+e(rating)+'</span><span class="imdb-max">/10</span></div>'}
+
+  var genreHtml="";
+  for(var g=0;g<genres.length&&g<5;g++){genreHtml+='<span class="genre-tag">'+e(genres[g])+'</span>'}
+
+  var detailsHtml="";
+  if(runtime)detailsHtml+='<span>⏱ '+e(runtime)+'</span>';
+  if(director)detailsHtml+='<span>🎬 '+e(director)+'</span>';
+  if(cast)detailsHtml+='<span>🎭 '+e(cast)+'</span>';
+
+  var ph="";var pl=d.platforms||[];
+  for(var i=0;i<pl.length;i++){var p=pl[i],c=gc(p.name),h=hi(p.hebrew_subtitles);
+    ph+='<div class="platform-card"><div class="platform-icon" style="background:'+c+'">'+e(p.name.charAt(0))+'</div><div class="platform-info"><div class="platform-name">'+e(p.name)+'</div>'+(p.note?'<div class="platform-note">'+e(p.note)+'</div>':'')+'</div><div class="heb-badge" style="background:'+h.b+';border:1px solid '+h.d+';color:'+h.c+'"><span style="font-size:13px">'+h.s+'</span><span style="font-size:10px">'+h.l+'</span></div></div>'}
+
+  var th="";
+  if(tr.length){for(var j=0;j<tr.length;j++){var s=tr[j],pp=pt(s.title||""),lk=id?"stremio://detail/"+im.t+"/"+id:"#";
+    th+='<div class="torrent-item"><span class="torrent-quality '+qc(s.title)+'">'+ql(s.title)+'</span><div class="torrent-details"><div class="torrent-name" title="'+e(s.title||pp.n)+'">'+e(pp.o||pp.n)+'</div><div class="torrent-meta">'+(pp.z?'<span>💾 '+e(pp.z)+'</span>':'')+(pp.s?'<span class="torrent-seeds">👤 '+e(pp.s)+'</span>':'')+(pp.h?'<span style="color:#10b981">עב</span>':'')+'</div></div><a class="torrent-open-btn" href="'+lk+'">▶ Stremio</a></div>'}}
+  else{th='<div class="torrent-none">No torrents found</div>'}
+
+  el.innerHTML='<div class="title-card"><div class="title-top">'
+    +(poster?'<img class="title-poster" src="'+poster+'" onerror="this.style.display=\'none\'">':'')
+    +'<div class="title-info"><h2 class="title-name">'+e(d.title)+'</h2>'
+    +'<div class="title-meta"><span class="type-badge '+tc+'">'+e(d.type)+'</span>'
+    +(d.year?'<span class="title-year">'+e(d.year)+'</span>':'')
+    +ratingHtml+'</div>'
+    +(genreHtml?'<div class="title-genres">'+genreHtml+'</div>':'')
+    +(desc?'<p class="title-desc">'+e(desc)+'</p>':'')
+    +(detailsHtml?'<div class="title-details">'+detailsHtml+'</div>':'')
+    +'</div></div></div>'
+    +'<h3 class="section-heading">📡 Streaming — '+pl.length+' platform'+(pl.length!==1?'s':'')+'</h3>'
+    +'<div class="platforms-list">'+ph+'</div>'
+    +'<div class="torrent-section"><div class="torrent-header"><div class="stremio-logo">S</div><div><div class="torrent-header-text">Stremio / Torrentio</div><div class="torrent-header-sub">'+tr.length+' stream'+(tr.length!==1?'s':'')+' · Tap ▶ to open in Stremio</div></div></div><div class="torrent-list">'+th+'</div></div>'
+    +(d.hebrew_subtitles_summary?'<div class="info-box hebrew"><span class="icon">🇮🇱</span><div><div class="label">Hebrew Subtitles</div><p>'+e(d.hebrew_subtitles_summary)+'</p></div></div>':'')
+    +(d.israel_availability_note?'<div class="info-box israel"><span class="icon">📍</span><div><div class="label">Israel Availability</div><p>'+e(d.israel_availability_note)+'</p></div></div>':'')
+    +'<button class="back-btn" id="bb">← Search another title</button>';
+
+  var sim=im&&im.similar?im.similar:[];
+  if(sim.length){
+    var sh='<div class="similar-section"><h3 class="section-heading">🎯 Similar Titles</h3><div class="similar-grid">';
+    for(var k=0;k<sim.length;k++){var sm=sim[k];
+      sh+='<div class="similar-card" data-q="'+e(sm.name)+'"><img class="similar-poster" src="'+(sm.poster||"")+'" alt="'+e(sm.name)+'" onerror="this.style.display=\'none\'"><div class="similar-info"><div class="similar-title">'+e(sm.name)+'</div><div class="similar-year">'+(sm.releaseInfo||"")+'</div></div></div>'}
+    sh+='</div></div>';el.innerHTML+=sh}
+
+  el.classList.remove("hidden");
+  document.getElementById("bb").onclick=function(){el.classList.add("hidden");$("si").value="";$("es").classList.remove("hidden");rr();$("si").focus()};
+  var cards=el.querySelectorAll(".similar-card");
+  for(var m=0;m<cards.length;m++){cards[m].onclick=function(){$("si").value=this.getAttribute("data-q");el.classList.add("hidden");ds()}}
+}
+
 function e(s){var d=document.createElement("div");d.textContent=s||"";return d.innerHTML}
 </script>
 </body>
